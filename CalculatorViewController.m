@@ -100,8 +100,4 @@
     }
 }
 
-- (void)viewDidUnload {
-    [self setBrainHistory:nil];
-    [super viewDidUnload];
-}
 @end
