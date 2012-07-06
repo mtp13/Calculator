@@ -89,12 +89,43 @@
         
 }
 
++ (NSSet *)variablesUsedInProgram:(id)program {
+    NSSet *_variablesUsedInProgram;
+    NSSet *operationsUsedInCalculator = [NSSet setWithObjects:@"+", @"*", @"-", 
+                                         @"/", @"sin", @"cos", @"π", @"sqrt",
+                                         @"+/-", nil];
+    NSMutableArray *stack;
+    if([program isKindOfClass:[NSArray class]]) {
+        stack = [program mutableCopy];
+        for (id stackObject in stack) {
+            if ([stackObject isKindOfClass:[NSString class]]) {
+                if (![operationsUsedInCalculator containsObject:stackObject]) {
+                    _variablesUsedInProgram = 
+                    [_variablesUsedInProgram setByAddingObject:stackObject]; 
+                }
+            }
+        }
+    }
+    return _variablesUsedInProgram;
+}
+
 + (double)runProgram:(id)program {
     NSMutableArray *stack;
     if([program isKindOfClass:[NSArray class]]) {
         stack = [program mutableCopy];
     }
     return [self popOperandOffStack:stack];
+}
+
++ (double)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues {
+    NSMutableArray *stack;
+    if([program isKindOfClass:[NSArray class]]) {
+        stack = [program mutableCopy];
+    }
+    
+    return 0; //TODO
+    
+    
 }
     
 - (void)clear {
