@@ -28,6 +28,15 @@
     [self.programStack addObject:operandObject];
 }
 
+- (void)pushVariable:(NSString *)variable; {
+    NSSet *operationsUsedInCalculator = [NSSet setWithObjects:@"+", @"*", @"-", 
+                                         @"/", @"sin", @"cos", @"π", @"sqrt",
+                                         @"+/-", nil];
+    if (![operationsUsedInCalculator containsObject:variable]) {
+        [self.programStack addObject:variable];
+    }
+}
+
 - (double)performOperation:(NSString *)operation {
     [self.programStack addObject:operation];
     return [CalculatorBrain runProgram:self.program];
