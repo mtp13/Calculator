@@ -23,16 +23,18 @@
     return _programStack;
 }
 
++ (NSSet *)operationsUsedInCalculator {
+    return [NSSet setWithObjects:@"+", @"*", @"-", @"/", @"sin", @"cos", @"π", 
+            @"sqrt", @"+/-", nil];
+}
+
 - (void)pushOperand:(double)operand {
     NSNumber *operandObject = [NSNumber numberWithDouble:operand];
     [self.programStack addObject:operandObject];
 }
 
 - (void)pushVariable:(NSString *)variable; {
-    NSSet *operationsUsedInCalculator = [NSSet setWithObjects:@"+", @"*", @"-", 
-                                         @"/", @"sin", @"cos", @"π", @"sqrt",
-                                         @"+/-", nil];
-    if (![operationsUsedInCalculator containsObject:variable]) {
+    if (![[CalculatorBrain operationsUsedInCalculator] containsObject:variable]) {
         [self.programStack addObject:variable];
     }
 }
@@ -91,22 +93,26 @@
 
 + (NSSet *)variablesUsedInProgram:(id)program {
     NSSet *_variablesUsedInProgram;
-    NSSet *operationsUsedInCalculator = [NSSet setWithObjects:@"+", @"*", @"-", 
-                                         @"/", @"sin", @"cos", @"π", @"sqrt",
-                                         @"+/-", nil];
     NSMutableArray *stack;
     if([program isKindOfClass:[NSArray class]]) {
-        stack = [program mutableCopy];
+        stack = program;
         for (id stackObject in stack) {
+            // if stackObject is string it must be either a variable or operation
             if ([stackObject isKindOfClass:[NSString class]]) {
-                if (![operationsUsedInCalculator containsObject:stackObject]) {
+                // if stackObject is not an operation it must be a variable
+                if (![[self operationsUsedInCalculator] containsObject:stackObject]) {
+                    // add stackObject to the set of _variablesUsedInProgram
                     _variablesUsedInProgram = 
                     [_variablesUsedInProgram setByAddingObject:stackObject]; 
                 }
             }
         }
     }
-    return _variablesUsedInProgram;
+    if ([_variablesUsedInProgram count] > 0) {
+        return _variablesUsedInProgram;
+    } else {
+        return nil;  //return nil if empty set
+    }
 }
 
 + (double)runProgram:(id)program {
