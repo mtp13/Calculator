@@ -11,6 +11,7 @@
 @interface CalculatorViewController ()
 @property (nonatomic) BOOL userIsInTheMiddleOfEnteringANumber;
 @property (nonatomic, strong) CalculatorBrain *brain;
+@property (nonatomic) NSDictionary *testVariableValues;
 @end
 
 @implementation CalculatorViewController
@@ -19,6 +20,7 @@
 @synthesize brainHistory = _brainHistory;
 @synthesize userIsInTheMiddleOfEnteringANumber = _userIsInTheMiddleOfEnteringANumber;
 @synthesize brain = _brain;
+@synthesize testVariableValues = _testVariableValues;
 
 - (CalculatorBrain *)brain {
     if (!_brain) _brain = [[CalculatorBrain alloc] init];
@@ -106,6 +108,21 @@
             self.userIsInTheMiddleOfEnteringANumber = NO;
         }
     }
+}
+- (IBAction)testPressed:(UIButton *)sender {
+    if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
+    NSString *testNumber = sender.currentTitle;
+    if ([testNumber isEqualToString:@"Test 1"]) {
+        self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   [NSNumber numberWithDouble:5], @"X", 
+                                   [NSNumber numberWithDouble:4.8], @"Y", 
+                                   [NSNumber numberWithDouble:0], @"FOO", 
+                                   nil];
+    }
+    double result = [CalculatorBrain runProgram:self.brain.program 
+                            usingVariableValues:self.testVariableValues];
+    self.display.text = [NSString stringWithFormat:@"%g", result];
+    self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
 @end

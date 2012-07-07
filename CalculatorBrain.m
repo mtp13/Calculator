@@ -23,10 +23,17 @@
     return _programStack;
 }
 
-+ (NSSet *)operationsImplementedInCalculator {
-    return [NSSet setWithObjects:@"+", @"*", @"-", @"/", @"sin", @"cos", @"π", 
-            @"sqrt", @"+/-", nil];
++ (BOOL)isOperation:(NSString *)operation {
+    BOOL _isOperation = NO;
+    NSSet *operationsImplementedInCalculator = 
+    [NSSet setWithObjects:@"+", @"*", @"-", @"/", @"sin", @"cos", @"π", @"sqrt",
+     @"+/-", nil];
+    if ([operationsImplementedInCalculator containsObject:operation]) {
+        _isOperation = YES;
+    }
+    return _isOperation;
 }
+
 
 - (void)pushOperand:(double)operand {
     NSNumber *operandObject = [NSNumber numberWithDouble:operand];
@@ -34,10 +41,7 @@
 }
 
 - (void)pushVariable:(NSString *)variable; {
-    if (![[CalculatorBrain operationsImplementedInCalculator] 
-          containsObject:variable]) {
         [self.programStack addObject:variable];
-    }
 }
 
 - (double)performOperation:(NSString *)operation {
@@ -95,16 +99,15 @@
 }
 
 + (NSSet *)variablesUsedInProgram:(id)program {
-    NSSet *_variablesUsedInProgram;
+    NSSet *_variablesUsedInProgram = [NSSet set];
     NSMutableArray *stack;
     if([program isKindOfClass:[NSArray class]]) {
-        stack = program;
+        stack = [program mutableCopy];
         for (id stackObject in stack) {
             // if stackObject is string it must be either a variable or operation
             if ([stackObject isKindOfClass:[NSString class]]) {
                 // if stackObject is not an operation it must be a variable
-                if (![[self operationsImplementedInCalculator] 
-                      containsObject:stackObject]) {
+                if (![self isOperation:stackObject]) {
                     // add stackObject to the set of _variablesUsedInProgram
                     _variablesUsedInProgram = 
                     [_variablesUsedInProgram setByAddingObject:stackObject]; 
@@ -132,11 +135,12 @@
     if([program isKindOfClass:[NSArray class]]) {
         stack = [program mutableCopy];
     }
-    NSSet *variablesInStack = [CalculatorBrain variablesUsedInProgram:stack];
+    NSSet *variablesInMyStack = [CalculatorBrain variablesUsedInProgram:stack];
     for (int i = 0; i < [stack count]; i++) {
         id stackObject = [stack objectAtIndex:i];
-        if ([variablesInStack containsObject:stackObject]) {
-            [stack replaceObjectAtIndex:i withObject:[variableValues objectForKey:stackObject]];
+        if ([variablesInMyStack containsObject:stackObject]) {
+            NSNumber *value = [variableValues objectForKey:stackObject];
+            [stack replaceObjectAtIndex:i withObject:value];
         }
     }
     return [self popOperandOffStack:stack];
