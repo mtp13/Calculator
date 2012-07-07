@@ -78,6 +78,15 @@
     }
     
 }
+- (IBAction)variablePressed:(UIButton *)sender {
+    NSString *variable = sender.currentTitle;
+    if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
+    self.display.text = variable;
+    [self.brain pushVariable:variable];
+    self.brainHistory.text = [self.brainHistory.text 
+                              stringByAppendingFormat:@" %@",self.display.text];
+    self.userIsInTheMiddleOfEnteringANumber = NO;
+}
 
 - (IBAction)clearPressed {
     [self.brain clear];
