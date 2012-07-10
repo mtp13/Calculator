@@ -41,7 +41,7 @@
                                  stringByAppendingString:digit];
         }
     } else { //not in the middle of entering a number
-        self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+  //      self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
         if (![digit isEqualToString:@"0"]) {
             if ([digit isEqualToString:@"."]) {
                 self.display.text = @"0.";
@@ -71,6 +71,7 @@
         }
         double result = [self.brain performOperation:operation];
         self.display.text = [NSString stringWithFormat:@"%g", result];
+        self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
         //self.brainHistory.text = [[self.brainHistory.text 
         //                          stringByReplacingOccurrencesOfString:@"=" withString:@""]
         //                          stringByAppendingFormat:@" %@ =", operation];

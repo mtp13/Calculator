@@ -82,36 +82,43 @@
     return  _isNoOperandOperation;
 }
 
++ (BOOL)isVariable:(NSString *)operation {
+    BOOL _isVariable = NO;
+    if (![self isOperation:operation]) {
+        _isVariable = YES;
+    }
+    return  _isVariable;
+}
 
-
-+ (NSString *) descriptionOffTopOfStack:(NSMutableArray *)stack {
++ (NSString *)descriptionOffTopOfStack:(NSMutableArray *)stack {
     
     NSString *result = @"";
     
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
+    NSLog(@"topOfStack=%@", topOfStack);
     
     if ([topOfStack isKindOfClass:[NSNumber class]]) {
-        result = [result stringByAppendingFormat:@"%g", topOfStack];
+        result = [NSString stringWithFormat:@"%@", topOfStack];
     }
     else if ([topOfStack isKindOfClass:[NSString class]]) {
         if ([self isNoOperandOperation:topOfStack]) {
-            result = [result stringByAppendingString:topOfStack];            
+            result = [NSString stringWithFormat:topOfStack];
+        } else if ([self isVariable:topOfStack]) {
+            result = [NSString stringWithFormat:topOfStack];
         } else if ([self isSingleOperandOperation:topOfStack]) {
-            result = [result stringByAppendingFormat:@"%@ (@g)", topOfStack,
+            result = [NSString stringWithFormat:@"%@ (%@)", topOfStack,
                       [self descriptionOffTopOfStack:stack]];
         } else if ([self isTwoOperandOperation:topOfStack]) {
-            result = [result stringByAppendingFormat:@"(%g %@ @g)", 
-                      [self descriptionOffTopOfStack:stack], topOfStack,
-                      [self descriptionOffTopOfStack:stack]];
+            id operand2 = [self descriptionOffTopOfStack:stack];
+            id operand1 = [self descriptionOffTopOfStack:stack];
+            result = [NSString stringWithFormat:@"(%@ %@ %@)", operand1,
+                      topOfStack, operand2];
         } 
     }
     
     return result;
-    
 }
-
-
 
 + (NSString *)descriptionOfProgram:(id)program {
     NSMutableArray *stack;
