@@ -41,9 +41,7 @@
                                  stringByAppendingString:digit];
         }
     } else { //not in the middle of entering a number
-        self.brainHistory.text = [self.brainHistory.text 
-                                  stringByReplacingOccurrencesOfString:@"=" 
-                                  withString:@""];
+        self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
         if (![digit isEqualToString:@"0"]) {
             if ([digit isEqualToString:@"."]) {
                 self.display.text = @"0.";
@@ -57,8 +55,7 @@
 
 - (IBAction)enterPressed {
     [self.brain pushOperand:[self.display.text doubleValue]];
-    self.brainHistory.text = [self.brainHistory.text 
-                              stringByAppendingFormat:@" %@",self.display.text];
+    self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
@@ -74,9 +71,9 @@
         }
         double result = [self.brain performOperation:operation];
         self.display.text = [NSString stringWithFormat:@"%g", result];
-        self.brainHistory.text = [[self.brainHistory.text 
-                                  stringByReplacingOccurrencesOfString:@"=" withString:@""]
-                                  stringByAppendingFormat:@" %@ =", operation];
+        //self.brainHistory.text = [[self.brainHistory.text 
+        //                          stringByReplacingOccurrencesOfString:@"=" withString:@""]
+        //                          stringByAppendingFormat:@" %@ =", operation];
     }
     
 }
@@ -85,14 +82,13 @@
     if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
     self.display.text = variable;
     [self.brain pushVariable:variable];
-    self.brainHistory.text = [self.brainHistory.text 
-                              stringByAppendingFormat:@" %@",self.display.text];
+    self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
 - (IBAction)clearPressed {
     [self.brain clear];
-    self.brainHistory.text = @" ";
+    self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     self.display.text = @"0";
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
