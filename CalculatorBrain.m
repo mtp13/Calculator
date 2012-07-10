@@ -23,25 +23,13 @@
     return _programStack;
 }
 
-+ (BOOL)isOperation:(NSString *)operation {
-    BOOL _isOperation = NO;
-    NSSet *operationsImplementedInCalculator = 
-    [NSSet setWithObjects:@"+", @"*", @"-", @"/", @"sin", @"cos", @"π", @"sqrt",
-     @"+/-", nil];
-    if ([operationsImplementedInCalculator containsObject:operation]) {
-        _isOperation = YES;
-    }
-    return _isOperation;
-}
-
-
 - (void)pushOperand:(double)operand {
     NSNumber *operandObject = [NSNumber numberWithDouble:operand];
     [self.programStack addObject:operandObject];
 }
 
 - (void)pushVariable:(NSString *)variable; {
-        [self.programStack addObject:variable];
+    [self.programStack addObject:variable];
 }
 
 - (double)performOperation:(NSString *)operation {
@@ -52,42 +40,52 @@
 - (id)program {
     return [self.programStack copy];
 }
++ (BOOL)isOperation:(NSString *)operation {
+    BOOL answer = NO;
+    NSSet *operationsImplementedInCalculator = 
+    [NSSet setWithObjects:@"+", @"*", @"-", @"/", @"sin", @"cos", @"π", @"sqrt",
+     @"+/-", nil];
+    if ([operationsImplementedInCalculator containsObject:operation]) {
+        answer = YES;
+    }
+    return answer;
+}
 
 + (BOOL)isTwoOperandOperation:(NSString *)operation {
-    BOOL _isTwoOperandOperation = NO;
+    BOOL answer = NO;
     NSSet *twoOperandOperations = [NSSet setWithObjects:@"+", @"*", @"-", @"/", 
                                    nil];
     if ([twoOperandOperations containsObject:operation]) {
-        _isTwoOperandOperation = YES;
+        answer = YES;
     }
-    return  _isTwoOperandOperation;
+    return  answer;
 }
 
 + (BOOL)isSingleOperandOperation:(NSString *)operation {
-    BOOL _isSingleOperandOperation = NO;
+    BOOL answer = NO;
     NSSet *singleOperandOperations = [NSSet setWithObjects:@"sin", @"cos", @"sqrt", 
                                    nil];
     if ([singleOperandOperations containsObject:operation]) {
-        _isSingleOperandOperation = YES;
+        answer = YES;
     }
-    return  _isSingleOperandOperation;
+    return  answer;
 }
 
 + (BOOL)isNoOperandOperation:(NSString *)operation {
-    BOOL _isNoOperandOperation = NO;
+    BOOL answer = NO;
     NSSet *noOperandOperations = [NSSet setWithObjects:@"π", @"+/-", nil];
     if ([noOperandOperations containsObject:operation]) {
-        _isNoOperandOperation = YES;
+        answer = YES;
     }
-    return  _isNoOperandOperation;
+    return  answer;
 }
 
 + (BOOL)isVariable:(NSString *)operation {
-    BOOL _isVariable = NO;
+    BOOL answer = NO;
     if (![self isOperation:operation]) {
-        _isVariable = YES;
+        answer = YES;
     }
-    return  _isVariable;
+    return  answer;
 }
 
 + (NSString *)descriptionOffTopOfStack:(NSMutableArray *)stack {
@@ -102,9 +100,9 @@
     }
     else if ([topOfStack isKindOfClass:[NSString class]]) {
         if ([self isNoOperandOperation:topOfStack]) {
-            result = [NSString stringWithFormat:topOfStack];
+            result = topOfStack;
         } else if ([self isVariable:topOfStack]) {
-            result = [NSString stringWithFormat:topOfStack];
+            result = topOfStack;
         } else if ([self isSingleOperandOperation:topOfStack]) {
             NSString *functionArgument = [self descriptionOffTopOfStack:stack];
             NSRange range = [functionArgument rangeOfString:@"("]; 
@@ -190,10 +188,13 @@
 }
 
 + (NSSet *)variablesUsedInProgram:(id)program {
+    
     NSSet *_variablesUsedInProgram = [NSSet set];
     NSMutableArray *stack;
+    
     if([program isKindOfClass:[NSArray class]]) {
         stack = [program mutableCopy];
+        
         for (id stackObject in stack) {
             // if stackObject is string it must be either a variable or operation
             if ([stackObject isKindOfClass:[NSString class]]) {
@@ -227,6 +228,7 @@
         stack = [program mutableCopy];
     }
     NSSet *variablesInMyStack = [CalculatorBrain variablesUsedInProgram:stack];
+    //TODO bug here if stack is nil, crashed when Test 3 pressed
     for (int i = 0; i < [stack count]; i++) {
         id stackObject = [stack objectAtIndex:i];
         if ([variablesInMyStack containsObject:stackObject]) {
