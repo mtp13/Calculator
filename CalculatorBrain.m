@@ -53,8 +53,73 @@
     return [self.programStack copy];
 }
 
++ (BOOL)isTwoOperandOperation:(NSString *)operation {
+    BOOL _isTwoOperandOperation = NO;
+    NSSet *twoOperandOperations = [NSSet setWithObjects:@"+", @"*", @"-", @"/", 
+                                   nil];
+    if ([twoOperandOperations containsObject:operation]) {
+        _isTwoOperandOperation = YES;
+    }
+    return  _isTwoOperandOperation;
+}
+
++ (BOOL)isSingleOperandOperation:(NSString *)operation {
+    BOOL _isSingleOperandOperation = NO;
+    NSSet *singleOperandOperations = [NSSet setWithObjects:@"sin", @"cos", @"sqrt", 
+                                   nil];
+    if ([singleOperandOperations containsObject:operation]) {
+        _isSingleOperandOperation = YES;
+    }
+    return  _isSingleOperandOperation;
+}
+
++ (BOOL)isNoOperandOperation:(NSString *)operation {
+    BOOL _isNoOperandOperation = NO;
+    NSSet *noOperandOperations = [NSSet setWithObjects:@"π", @"+/-", nil];
+    if ([noOperandOperations containsObject:operation]) {
+        _isNoOperandOperation = YES;
+    }
+    return  _isNoOperandOperation;
+}
+
+
+
++ (NSString *) descriptionOffTopOfStack:(NSMutableArray *)stack {
+    
+    NSString *result = @"";
+    
+    id topOfStack = [stack lastObject];
+    if (topOfStack) [stack removeLastObject];
+    
+    if ([topOfStack isKindOfClass:[NSNumber class]]) {
+        result = [result stringByAppendingFormat:@"%g", topOfStack];
+    }
+    else if ([topOfStack isKindOfClass:[NSString class]]) {
+        if ([self isNoOperandOperation:topOfStack]) {
+            result = [result stringByAppendingString:topOfStack];            
+        } else if ([self isSingleOperandOperation:topOfStack]) {
+            result = [result stringByAppendingFormat:@"%@ (@g)", topOfStack,
+                      [self descriptionOffTopOfStack:stack]];
+        } else if ([self isTwoOperandOperation:topOfStack]) {
+            result = [result stringByAppendingFormat:@"(%g %@ @g)", 
+                      [self descriptionOffTopOfStack:stack], topOfStack,
+                      [self descriptionOffTopOfStack:stack]];
+        } 
+    }
+    
+    return result;
+    
+}
+
+
+
 + (NSString *)descriptionOfProgram:(id)program {
-    return @"Implement this in Assignment 2";
+    NSMutableArray *stack;
+    if([program isKindOfClass:[NSArray class]]) {
+        stack = [program mutableCopy];
+    }
+    return [self descriptionOffTopOfStack:stack];
+
 }
 
 + (double)popOperandOffStack:(NSMutableArray *)stack {
