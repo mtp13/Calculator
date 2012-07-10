@@ -12,6 +12,8 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *display;
 @property (weak, nonatomic) IBOutlet UILabel *brainHistory;
+@property (weak, nonatomic) IBOutlet UILabel *variablesUsedInProgramDisplay;
+
 
 
 @end

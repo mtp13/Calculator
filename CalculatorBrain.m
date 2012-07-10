@@ -96,7 +96,6 @@
     
     id topOfStack = [stack lastObject];
     if (topOfStack) [stack removeLastObject];
-    NSLog(@"topOfStack=%@", topOfStack);
     
     if ([topOfStack isKindOfClass:[NSNumber class]]) {
         result = [NSString stringWithFormat:@"%@", topOfStack];
@@ -107,14 +106,27 @@
         } else if ([self isVariable:topOfStack]) {
             result = [NSString stringWithFormat:topOfStack];
         } else if ([self isSingleOperandOperation:topOfStack]) {
-            result = [NSString stringWithFormat:@"%@ (%@)", topOfStack,
-                      [self descriptionOffTopOfStack:stack]];
+            NSString *functionArgument = [self descriptionOffTopOfStack:stack];
+            NSRange range = [functionArgument rangeOfString:@"("]; 
+            if (range.location == 0) {
+                result = [NSString stringWithFormat:@"%@%@", topOfStack,
+                          functionArgument];
+            } else {
+                result = [NSString stringWithFormat:@"%@(%@)", topOfStack,
+                          functionArgument];
+            }
         } else if ([self isTwoOperandOperation:topOfStack]) {
             id operand2 = [self descriptionOffTopOfStack:stack];
             id operand1 = [self descriptionOffTopOfStack:stack];
-            result = [NSString stringWithFormat:@"(%@ %@ %@)", operand1,
-                      topOfStack, operand2];
-        } 
+            if ([topOfStack isEqual:@"*"]  || [topOfStack isEqual:@"/"]) {
+                result = [NSString stringWithFormat:@"%@ %@ %@", operand1,
+                          topOfStack, operand2];
+            } else {
+                
+                result = [NSString stringWithFormat:@"(%@ %@ %@)", operand1,
+                          topOfStack, operand2];
+            }
+        }
     }
     
     return result;
@@ -122,11 +134,18 @@
 
 + (NSString *)descriptionOfProgram:(id)program {
     NSMutableArray *stack;
+    NSString *description = @"";
     if([program isKindOfClass:[NSArray class]]) {
         stack = [program mutableCopy];
     }
-    return [self descriptionOffTopOfStack:stack];
-
+    
+    description = [self descriptionOffTopOfStack:stack];
+    while ([stack count] > 0) {
+        description = [NSString stringWithFormat:@"%@, %@", description,
+                       [self descriptionOffTopOfStack:stack]];
+    }
+    
+    return description;
 }
 
 + (double)popOperandOffStack:(NSMutableArray *)stack {

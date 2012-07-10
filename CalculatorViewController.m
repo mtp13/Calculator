@@ -18,6 +18,7 @@
 
 @synthesize display = _display;
 @synthesize brainHistory = _brainHistory;
+@synthesize variablesUsedInProgramDisplay = _variablesUsedInProgramDisplay;
 @synthesize userIsInTheMiddleOfEnteringANumber = _userIsInTheMiddleOfEnteringANumber;
 @synthesize brain = _brain;
 @synthesize testVariableValues = _testVariableValues;
@@ -41,7 +42,6 @@
                                  stringByAppendingString:digit];
         }
     } else { //not in the middle of entering a number
-  //      self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
         if (![digit isEqualToString:@"0"]) {
             if ([digit isEqualToString:@"."]) {
                 self.display.text = @"0.";
@@ -70,11 +70,10 @@
             [self enterPressed];
         }
         double result = [self.brain performOperation:operation];
+        //double result = [CalculatorBrain runProgram:self.brain.program
+        //                        usingVariableValues:self.testVariableValues];
         self.display.text = [NSString stringWithFormat:@"%g", result];
         self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
-        //self.brainHistory.text = [[self.brainHistory.text 
-        //                          stringByReplacingOccurrencesOfString:@"=" withString:@""]
-        //                          stringByAppendingFormat:@" %@ =", operation];
     }
     
 }
@@ -106,6 +105,16 @@
         }
     }
 }
+- (void)updateVariablesUsedInProgramDisplay {
+    NSSet *variables = [CalculatorBrain variablesUsedInProgram:self.brain.program];
+    NSString *display = @"";
+    for (NSString *variable in variables) {
+        display = [display stringByAppendingFormat:@"%@ = %@  ",variable, 
+                   [self.testVariableValues objectForKey:variable]];
+    }
+    self.variablesUsedInProgramDisplay.text = display;
+}
+
 - (IBAction)testPressed:(UIButton *)sender {
     if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
     NSString *testNumber = sender.currentTitle;
@@ -116,6 +125,14 @@
                                    [NSNumber numberWithDouble:0], @"FOO", 
                                    nil];
     }
+    if ([testNumber isEqualToString:@"Test 2"]) {
+        self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:nil];
+    }
+    if ([testNumber isEqualToString:@"Test 3"]) {
+        self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:nil];
+    }
+    [self updateVariablesUsedInProgramDisplay];
+    
     double result = [CalculatorBrain runProgram:self.brain.program 
                             usingVariableValues:self.testVariableValues];
     self.display.text = [NSString stringWithFormat:@"%g", result];
