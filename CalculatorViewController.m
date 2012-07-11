@@ -60,7 +60,7 @@
 
 - (IBAction)enterPressed {
     [self.brain pushOperand:[self.display.text doubleValue]];
-    self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+    [self updateUI];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
@@ -74,17 +74,13 @@
         if (self.userIsInTheMiddleOfEnteringANumber) {
             [self enterPressed];
         }
-        double result = [self.brain performOperation:operation];
-        //double result = [CalculatorBrain runProgram:self.brain.program
-        //                        usingVariableValues:self.testVariableValues];
-        self.display.text = [NSString stringWithFormat:@"%g", result];
-        self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+        [self.brain performOperation:operation];
+        [self updateUI];
     }
-    
 }
+
 - (IBAction)variablePressed:(UIButton *)sender {
     NSString *variable = sender.currentTitle;
-//    if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
     self.display.text = variable;
     [self.brain pushVariable:variable];
     self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
@@ -109,6 +105,7 @@
         }
     }
 }
+
 - (IBAction)undoPressed {
     
     if (!self.userIsInTheMiddleOfEnteringANumber) { 

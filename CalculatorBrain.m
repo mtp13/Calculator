@@ -241,7 +241,7 @@
     if (stackObject) {
         for (int i = 0; i < ([stack count] - 1); i++) 
         {
-            id stackObject = [stack objectAtIndex:i];
+            stackObject = [stack objectAtIndex:i];
             if ([variablesInMyStack containsObject:stackObject]) 
             {
                 NSNumber *value = [variableValues objectForKey:stackObject];
