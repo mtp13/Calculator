@@ -64,7 +64,7 @@
 + (BOOL)isSingleOperandOperation:(NSString *)operation {
     BOOL answer = NO;
     NSSet *singleOperandOperations = [NSSet setWithObjects:@"sin", @"cos", @"sqrt", 
-                                   nil];
+                                      nil];
     if ([singleOperandOperations containsObject:operation]) {
         answer = YES;
     }
@@ -179,67 +179,86 @@
             double operand = [self popOperandOffStack:stack];
             if (operand >= 0) result = sqrt(operand);
         } else if ([operation isEqualToString:@"+/-"]) {
-            result = - [self popOperandOffStack:stack];
+            result = -1 * [self popOperandOffStack:stack];
         }
     }
     
     return result;
-        
+    
 }
 
-+ (NSSet *)variablesUsedInProgram:(id)program {
++ (NSSet *)variablesUsedInProgram:(id)program 
+{
     
     NSSet *_variablesUsedInProgram = [NSSet set];
     NSMutableArray *stack;
     
-    if([program isKindOfClass:[NSArray class]]) {
+    if([program isKindOfClass:[NSArray class]]) 
+        {
         stack = [program mutableCopy];
-        
-        for (id stackObject in stack) {
+        for (id stackObject in stack) 
+            {
             // if stackObject is string it must be either a variable or operation
-            if ([stackObject isKindOfClass:[NSString class]]) {
+            if ([stackObject isKindOfClass:[NSString class]]) 
+                {
                 // if stackObject is not an operation it must be a variable
-                if (![self isOperation:stackObject]) {
+                if (![self isOperation:stackObject]) 
+                    {
                     // add stackObject to the set of _variablesUsedInProgram
                     _variablesUsedInProgram = 
                     [_variablesUsedInProgram setByAddingObject:stackObject]; 
+                    }
                 }
             }
         }
-    }
-    if ([_variablesUsedInProgram count] > 0) {
+    if ([_variablesUsedInProgram count] > 0) 
+        {
         return _variablesUsedInProgram;
-    } else {
-        return nil;  //return nil if empty set
-    }
-}
-
-+ (double)runProgram:(id)program {
-    NSMutableArray *stack;
-    if([program isKindOfClass:[NSArray class]]) {
-        stack = [program mutableCopy];
-    }
-    return [self popOperandOffStack:stack];
-}
-
-+ (double)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues {
-    NSMutableArray *stack;
-    if([program isKindOfClass:[NSArray class]]) {
-        stack = [program mutableCopy];
-    }
-    NSSet *variablesInMyStack = [CalculatorBrain variablesUsedInProgram:stack];
-    //TODO bug here if stack is nil, crashed when Test 3 pressed
-    for (int i = 0; i < [stack count]; i++) {
-        id stackObject = [stack objectAtIndex:i];
-        if ([variablesInMyStack containsObject:stackObject]) {
-            NSNumber *value = [variableValues objectForKey:stackObject];
-            [stack replaceObjectAtIndex:i withObject:value];
+        } else {
+            return nil;  //return nil if empty set
         }
-    }
+}
+
++ (double)runProgram:(id)program 
+{
+    NSMutableArray *stack;
+    if([program isKindOfClass:[NSArray class]]) 
+        {
+        stack = [program mutableCopy];
+        }
     return [self popOperandOffStack:stack];
 }
-    
-- (void)clear {
+
++ (double)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues
+{
+    NSMutableArray *stack;
+    if([program isKindOfClass:[NSArray class]])
+        {
+        stack = [program mutableCopy];
+        }
+    NSSet *variablesInMyStack = [CalculatorBrain variablesUsedInProgram:stack];
+    for (int i = 0; i < ([stack count] - 1); i++) 
+        {
+        id stackObject = [stack objectAtIndex:i];
+        if ([variablesInMyStack containsObject:stackObject]) 
+            {
+            NSNumber *value = [variableValues objectForKey:stackObject];
+            //            NSLog(@"value=%@", value);
+            if (value) 
+                {
+                [stack replaceObjectAtIndex:i withObject:value];
+                } else 
+                    {
+                    [stack replaceObjectAtIndex:i withObject:
+                     [NSNumber numberWithDouble:0]];
+                    }
+            }
+        }
+    return [self popOperandOffStack:stack];
+}
+
+- (void)clear 
+{
     [self.programStack removeAllObjects];
 }
 

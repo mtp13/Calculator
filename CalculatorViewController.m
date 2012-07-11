@@ -63,7 +63,7 @@
     NSString *operation = sender.currentTitle;
     if ([operation isEqualToString:@"+/-"] && 
         self.userIsInTheMiddleOfEnteringANumber) {
-        double operand = - [self.display.text doubleValue];
+        double operand = -1 * [self.display.text doubleValue];
         self.display.text = [NSString stringWithFormat:@"%g", operand];
     } else {
         if (self.userIsInTheMiddleOfEnteringANumber) {
@@ -79,7 +79,7 @@
 }
 - (IBAction)variablePressed:(UIButton *)sender {
     NSString *variable = sender.currentTitle;
-    if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
+//    if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
     self.display.text = variable;
     [self.brain pushVariable:variable];
     self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
@@ -132,7 +132,6 @@
         self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:nil];
     }
     [self updateVariablesUsedInProgramDisplay];
-    
     double result = [CalculatorBrain runProgram:self.brain.program 
                             usingVariableValues:self.testVariableValues];
     self.display.text = [NSString stringWithFormat:@"%g", result];
