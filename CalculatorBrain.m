@@ -233,33 +233,41 @@
 {
     NSMutableArray *stack;
     if([program isKindOfClass:[NSArray class]])
-        {
+    {
         stack = [program mutableCopy];
-        }
+    }
     NSSet *variablesInMyStack = [CalculatorBrain variablesUsedInProgram:stack];
-    for (int i = 0; i < ([stack count] - 1); i++) 
+    id stackObject = [stack lastObject];
+    if (stackObject) {
+        for (int i = 0; i < ([stack count] - 1); i++) 
         {
-        id stackObject = [stack objectAtIndex:i];
-        if ([variablesInMyStack containsObject:stackObject]) 
+            id stackObject = [stack objectAtIndex:i];
+            if ([variablesInMyStack containsObject:stackObject]) 
             {
-            NSNumber *value = [variableValues objectForKey:stackObject];
-            //            NSLog(@"value=%@", value);
-            if (value) 
+                NSNumber *value = [variableValues objectForKey:stackObject];
+                //            NSLog(@"value=%@", value);
+                if (value) 
                 {
-                [stack replaceObjectAtIndex:i withObject:value];
+                    [stack replaceObjectAtIndex:i withObject:value];
                 } else 
-                    {
+                {
                     [stack replaceObjectAtIndex:i withObject:
                      [NSNumber numberWithDouble:0]];
-                    }
+                }
             }
         }
+    }
     return [self popOperandOffStack:stack];
 }
 
 - (void)clear 
 {
     [self.programStack removeAllObjects];
+}
+
+- (void)undo 
+{
+    [self.programStack removeLastObject];
 }
 
 

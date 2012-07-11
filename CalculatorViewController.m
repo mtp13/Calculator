@@ -23,6 +23,11 @@
 @synthesize brain = _brain;
 @synthesize testVariableValues = _testVariableValues;
 
+- (NSDictionary *)testVariableValues {
+    if (!_testVariableValues) _testVariableValues = [[NSDictionary alloc] init];
+    return _testVariableValues;
+}
+
 - (CalculatorBrain *)brain {
     if (!_brain) _brain = [[CalculatorBrain alloc] init];
     return _brain;
@@ -88,8 +93,7 @@
 
 - (IBAction)clearPressed {
     [self.brain clear];
-    self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
-    self.display.text = @"0";
+    [self updateUI];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
@@ -100,11 +104,21 @@
                                  [self.display.text length] - 1];
         }
         if ([self.display.text length] == 0) {
-            self.display.text = @"0";
+            [self updateUI];
             self.userIsInTheMiddleOfEnteringANumber = NO;
         }
     }
 }
+- (IBAction)undoPressed {
+    
+    if (!self.userIsInTheMiddleOfEnteringANumber) { 
+        [self.brain undo];
+        [self updateUI];
+    } else {
+        [self backspacePressed];
+    }
+}
+
 - (void)updateVariablesUsedInProgramDisplay {
     NSSet *variables = [CalculatorBrain variablesUsedInProgram:self.brain.program];
     NSString *display = @"";
@@ -113,6 +127,14 @@
                    [self.testVariableValues objectForKey:variable]];
     }
     self.variablesUsedInProgramDisplay.text = display;
+}
+
+- (void)updateUI {
+    [self updateVariablesUsedInProgramDisplay];
+    double result = [CalculatorBrain runProgram:self.brain.program 
+                            usingVariableValues:self.testVariableValues];
+    self.display.text = [NSString stringWithFormat:@"%g", result];
+    self.brainHistory.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
 }
 
 - (IBAction)testPressed:(UIButton *)sender {
@@ -131,10 +153,7 @@
     if ([testNumber isEqualToString:@"Test 3"]) {
         self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:nil];
     }
-    [self updateVariablesUsedInProgramDisplay];
-    double result = [CalculatorBrain runProgram:self.brain.program 
-                            usingVariableValues:self.testVariableValues];
-    self.display.text = [NSString stringWithFormat:@"%g", result];
+    [self updateUI];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
